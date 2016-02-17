@@ -25,8 +25,8 @@ class TranslatableChecker
      * @var array
      */
     protected $supportedModels = array();
-
-    /**
+    
+     /**
      * @param array $supportedInterfaces
      */
     public function setSupportedInterfaces(array $supportedInterfaces)

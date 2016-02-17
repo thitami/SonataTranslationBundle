@@ -33,7 +33,7 @@ class SonataTranslationExtension extends Extension
 
         $container->setParameter('sonata_translation.locales', $config['locales']);
         $container->setParameter('sonata_translation.default_locale', $config['default_locale']);
-
+        
         $isEnabled = false;
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('service.xml');

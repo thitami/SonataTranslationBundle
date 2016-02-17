@@ -20,10 +20,11 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AdminExtensionCompilerPass implements CompilerPassInterface
 {
+
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process()
     {
         $translationTargets = $container->getParameter('sonata_translation.targets');
         $adminExtensionReferences = $this->getAdminExtensionReferenceByTypes(array_keys($translationTargets));
@@ -35,13 +36,15 @@ class AdminExtensionCompilerPass implements CompilerPassInterface
                 continue;
             }
             $modelClassReflection = new \ReflectionClass($modelClass);
+            $translatableChecker = $container->get("sonata.translatable_checker");
 
             foreach ($adminExtensionReferences as $type => $reference) {
                 foreach ($translationTargets[$type]['implements'] as $interface) {
-                    if ($modelClassReflection->implementsInterface($interface)) {
+                    if ($translatableChecker->isTranslatable($modelClassReflection)) {
                         $admin->addMethodCall('addExtension', array($reference));
                     }
                 }
+
                 foreach ($translationTargets[$type]['instanceof'] as $class) {
                     if ($modelClassReflection->getName() == $class || $modelClassReflection->isSubclassOf($class)) {
                         $admin->addMethodCall('addExtension', array($reference));
@@ -60,9 +63,10 @@ class AdminExtensionCompilerPass implements CompilerPassInterface
     {
         $references = array();
         foreach ($types as $type) {
-            $references[$type] = new Reference('sonata_translation.admin.extension.'.$type.'_translatable');
+            $references[$type] = new Reference('sonata_translation.admin.extension.' . $type . '_translatable');
         }
 
         return $references;
     }
+
 }
